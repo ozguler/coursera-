@@ -277,3 +277,5 @@ def test_baseball_statistics():
 # commented out when submitting to OwlTest/CourseraTest.
 
 # test_baseball_statistics()
+
+print(read_csv_as_list_dict("/Users/ozguler/Downloads/gitrepo/coursera_python_data_represantations/C3_Master_2016.csv",",",":"))
