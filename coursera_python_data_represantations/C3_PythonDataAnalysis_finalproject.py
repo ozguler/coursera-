@@ -7,6 +7,7 @@ about the expected behavior of the program.
 """
 
 import csv
+import random
 
 ##
 ## Provided code from Week 3 Project
@@ -24,9 +25,10 @@ def read_csv_as_list_dict(filename, separator, quote):
       list map the field names to the field values for that row.
     """
     table = []
-    with open(filename, newline='') as csvfile:
+    with open(filename) as csvfile:
         csvreader = csv.DictReader(csvfile, delimiter=separator, quotechar=quote)
         for row in csvreader:
+#            print row
             table.append(row)
     return table
 
@@ -121,7 +123,11 @@ def filter_by_year(statistics, year, yearid):
       Returns a list of batting statistics dictionaries that
       are from the input year.
     """
-    return []
+    table = []
+    for row in statistics:
+        if row["yearID"] == str(yearid):
+            table.append(row)
+    return table
 
 
 def top_player_ids(info, statistics, formula, numplayers):
@@ -138,7 +144,12 @@ def top_player_ids(info, statistics, formula, numplayers):
       computed by formula, of the top numplayers players sorted in
       decreasing order of the computed statistic.
     """
-    return []
+    stat_list = []
+    for row in statistics:
+        stat_list.append((row['playerID'], formula(info,row)))
+
+    stat_list.sort(key = lambda pair:pair[1], reverse = True)
+    return stat_list[0:numplayers]
 
 
 def lookup_player_names(info, top_ids_and_stats):
@@ -273,9 +284,29 @@ def test_baseball_statistics():
     print("")
 
 
-# Make sure the following call to test_baseball_statistics is
-# commented out when submitting to OwlTest/CourseraTest.
 
-# test_baseball_statistics()
+#Test Script to test Part1 Function1 Filter_by_year
+statistics = read_csv_as_list_dict("/Users/ozguler/Downloads/gitrepo/coursera_python_data_represantations/Batting_2016.csv",","," ")
+#print(statistics)
+x = filter_by_year(statistics, 1977, 1977 )
+#print(x)
 
-print(read_csv_as_list_dict("/Users/ozguler/Downloads/gitrepo/coursera_python_data_represantations/C3_Master_2016.csv",",",":"))
+#Test Script to test Part1 Function2 top_player_ids
+statistics = read_csv_as_list_dict("/Users/ozguler/Downloads/gitrepo/coursera_python_data_represantations/Batting_2016.csv",","," ")
+info =              {"masterfile": "Master_2016.csv",   # Name of Master CSV file
+                    "battingfile": "Batting_2016.csv", # Name of Batting CSV file
+                    "separator": ",",                  # Separator character in CSV files
+                    "quote": '"',                      # Quote character in CSV files
+                    "playerid": "playerID",            # Player ID field name
+                    "firstname": "nameFirst",          # First name field name
+                    "lastname": "nameLast",            # Last name field name
+                    "yearid": "yearID",                # Year field name
+                    "atbats": "AB",                    # At bats field name
+                    "hits": "H",                       # Hits field name
+                    "doubles": "2B",                   # Doubles field name
+                    "triples": "3B",                   # Triples field name
+                    "homeruns": "HR",                  # Home runs field name
+                    "walks": "BB",                     # Walks field name
+                    "battingfields": ["AB", "H", "2B", "3B", "HR", "BB"]}
+
+print(top_player_ids(info, x, batting_average, 3))

@@ -1,0 +1,20 @@
+read_csv_as_list_dict
+      Returns a list of dictionaries where each item in the list corresponds to a row in the CSV file.
+      The dictionaries in the list map the field names to the field values for that row.
+
+read_csv_as_nested_dict
+      Returns a dictionary of dictionaries where the outer dictionary maps the value in the key_field to the corresponding row in the CSV file.
+      The inner dictionaries map the field names to the field values for that row.
+
+read_csv_as_list_dict
+      returns a list of dictionaries
+      each item in the list corresponds to a row in the csv file
+      DictReader turns the .csv lines into a Dicts  which then form the list (list of dicts remember?)
+      DictReader maps the field names (row1) to the values in the row.
+         [{row1_dictionary}, {row2_dictionary},..., {rown_dictionary}]
+         dictionary key'ler field_name'ler, value'lar row'daki value'lar...
+
+read_csv_as_nested_dict
+
+
+

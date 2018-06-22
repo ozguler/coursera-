@@ -1,0 +1,35 @@
+"""
+Using csv.DictReader.
+"""
+
+import csv
+
+MONTHS = ('Jan', 'Feb', 'Mar', 'Apr',
+          'May', 'Jun', 'Jul', 'Aug',
+          'Sep', 'Oct', 'Nov', 'Dec')
+
+def dictparse(csvfilename, keyfield):
+    """
+    Reads CSV file named csvfilename, parses
+    it's content and returns the data within
+    the file as a dictionary of dictionaries.
+    """
+    table = {}
+    with open(csvfilename, "rt") as csvfile:
+        csvreader = csv.DictReader(csvfile,
+                                   skipinitialspace=True)
+        for row in csvreader:
+            table[row[keyfield]] = row
+            print table[row[keyfield]]
+    print(table)
+    return table
+
+
+def print_table(table):
+    """
+    Print out table, which must be a dictionary
+    of dictionaries, in a nicely formatted way.
+    """
+
+table = dictparse("/Users/ozguler/Downloads/gitrepo/coursera_python_data_represantations/hightemp.csv", 'City')
+print_table(table)
