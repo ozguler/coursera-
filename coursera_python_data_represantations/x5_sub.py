@@ -7,11 +7,11 @@ about the expected behavior of the program.
 """
 
 import csv
-import random
 
 ##
 ## Provided code from Week 3 Project
 ##
+
 
 def read_csv_as_list_dict(filename, separator, quote):
     """
@@ -28,7 +28,6 @@ def read_csv_as_list_dict(filename, separator, quote):
     with open(filename) as csvfile:
         csvreader = csv.DictReader(csvfile, delimiter=separator, quotechar=quote)
         for row in csvreader:
-#            print row
             table.append(row)
     return table
 
@@ -146,9 +145,12 @@ def top_player_ids(info, statistics, formula, numplayers):
     """
     stat_list = []
     for row in statistics:
-        stat_list.append((row['playerID'], formula(info,row)))
+#        stat_list.append((row['playerID'], formula(info,row)))
+        stat_list.append((row, formula(info,statistics[row])))
+
 
     stat_list.sort(key = lambda pair:pair[1], reverse = True)
+#    print(stat_list[0:numplayers])
     return stat_list[0:numplayers]
 
 
@@ -164,12 +166,16 @@ def lookup_player_names(info, top_ids_and_stats):
       the input and "FirstName LastName" is the name of the player
       corresponding to the player ID in the input.
     """
+    csv_as_list_dict  = read_csv_as_list_dict(info['masterfile'],","," ")
     for player in top_ids_and_stats:
-#        print(player[0])
-        for row in info:
-           if row['playerID'] == player[0]:
-#               print(row['nameFirst'], " ", row['nameLast'])
-                print('{} "---" {} " " {})'.format(player[1],row['nameFirst'], row['nameLast'])
+        for row in csv_as_list_dict:
+            if row[info["playerid"]] == player[0]:
+#                print(row['nameFirst'], " ", row["nameLast"])
+#                print('{0:.3f}---{1} {2}'.format(player[1],row['nameFirst'],row['nameLast']))
+                print('{0:.3f}---{1} {2}'.format(player[1],row[info['firstname']
+                ],row[info['lastname']]))
+
+    return []
 
 
 def compute_top_stats_year(info, formula, numplayers, year):
@@ -185,6 +191,16 @@ def compute_top_stats_year(info, formula, numplayers, year):
       Returns a list of strings for the top numplayers in the given year
       according to the given formula.
     """
+    file_x = "/Users/ozguler/Downloads/gitrepo/coursera_python_data_represantations/Batting2016.csv"
+    statistics = read_csv_as_list_dict(file_x,","," ")
+    info_sub = filter_by_year(statistics, year, year)
+#   print(info_sub)
+    top_players = top_player_ids(info,info_sub, formula, numplayers)
+#   print(top_players)
+    file_y = "/Users/ozguler/Downloads/gitrepo/coursera_python_data_represantations/Master2016.csv"
+    player_info = read_csv_as_list_dict(file_y,","," ")
+    lookup_player_names(player_info, top_players)
+
     return []
 
 
@@ -203,8 +219,34 @@ def aggregate_by_player_id(statistics, playerid, fields):
       are dictionaries of aggregated stats.  Only the fields from the fields
       input will be aggregated in the aggregated stats dictionaries.
     """
-    return {}
+#   print(statistics)
+#   print(fields)
+    agg_stats = {}
 
+    for row in statistics:
+        if row[playerid] in agg_stats:
+            for item in range(0,len(fields)):
+                agg_stats[row[playerid]][fields[item]] += int(row[fields[item]])
+        else:
+            agg_stats[row[playerid]]={}
+            for item in range(0,len(fields)):
+                agg_stats[row[playerid]][fields[item]] = 0
+                agg_stats[row[playerid]][playerid]= row[playerid]
+
+            for item in range(0,len(fields)):
+                agg_stats[row[playerid]][fields[item]] += int(row[fields[item]])
+
+    return agg_stats
+
+#x = [{'stat2': '4', 'stat3': '5', 'stat1': '3', 'player': '1'},
+#{'stat2': '1', 'stat3': '8', 'stat1': '2', 'player': '1'},
+#{'stat2': '7', 'stat3': '4', 'stat1': '5', 'player': '1'}]
+
+
+#xx = aggregate_by_player_id(x, 'player', ['stat1'])
+#print(xx)
+
+#expected {'1': {'stat1': 10, 'player': '1'}} but received {'1': {'stat1': 10}}
 
 def compute_top_stats_career(info, formula, numplayers):
     """
@@ -215,6 +257,41 @@ def compute_top_stats_career(info, formula, numplayers):
                     computes a compound statistic
       numplayers  - Number of top players to return
     """
+
+    statistics = read_csv_as_list_dict(info['battingfile'],","," ")
+#    print(statistics[2].keys())
+    agg_stats = []
+#    players = []
+#    battingfields =  ["AB", "H", "2B", "3B", "HR", "BB"]
+#    for row in statistics:
+#    print(statistics)
+
+
+#    info_stats = {
+#        "separator": ",",                  # Separator character in CSV files
+#        "quote": '"',                      # Quote character in CSV files
+#        "playerid": "playerID",
+#        "firstname": "nameFirst",          # First name field name
+#        "lastname": "nameLast",            # Last name field name
+#        "yearid": "yearID",                # Year field name
+#        "atbats": "AB",                    # At bats field name
+#        "hits": "H",                       # Hits field name
+#        "doubles": "2B",                   # Doubles field name
+#        "triples": "3B",                   # Triples field name
+#        "homeruns": "HR",
+#        "homers" : "HR",                 # Home runs field name
+#        "walks": "BB"                     # Walks field name
+#        }
+
+
+#    battingfields = info['battingfields']
+    #battingfields_ = []
+
+
+    agg_stats = aggregate_by_player_id(statistics,info["playerid"],info["battingfields"])
+    top_players = top_player_ids(info, agg_stats, formula, numplayers)
+    lookup_player_names(info,top_players)
+
     return []
 
 
@@ -290,32 +367,21 @@ def test_baseball_statistics():
 
 
 
-#Test Script to test Part1 Function1 Filter_by_year
-statistics = read_csv_as_list_dict("/Users/ozguler/Downloads/gitrepo/coursera_python_data_represantations/Batting_2016.csv",","," ")
-#print(statistics)
-x = filter_by_year(statistics, 1977, 1977 )
-#print(x)
-
-#Test Script to test Part1 Function2 top_player_ids
-#statistics = read_csv_as_list_dict("/Users/ozguler/Downloads/gitrepo/coursera_python_data_represantations/Batting_2016.csv",","," ")
-info =              {"masterfile": "Master_2016.csv",   # Name of Master CSV file
-                    "battingfile": "Batting_2016.csv", # Name of Batting CSV file
-                    "separator": ",",                  # Separator character in CSV files
-                    "quote": '"',                      # Quote character in CSV files
-                    "playerid": "playerID",            # Player ID field name
-                    "firstname": "nameFirst",          # First name field name
-                    "lastname": "nameLast",            # Last name field name
-                    "yearid": "yearID",                # Year field name
-                    "atbats": "AB",                    # At bats field name
-                    "hits": "H",                       # Hits field name
-                    "doubles": "2B",                   # Doubles field name
-                    "triples": "3B",                   # Triples field name
-                    "homeruns": "HR",                  # Home runs field name
-                    "walks": "BB",                     # Walks field name
-                    "battingfields": ["AB", "H", "2B", "3B", "HR", "BB"]}
-
-tpid = top_player_ids(info, x, batting_average, 5)
-print(tpid)
-
-x  = read_csv_as_list_dict("/Users/ozguler/Downloads/gitrepo/coursera_python_data_represantations/Master_2016.csv",","," ")
-lookup_player_names(x, tpid)
+#"""
+#info = {"masterfile": "Master_2016.csv",   # Name of Master CSV file
+#        "battingfile": "Batting_2016.csv", # Name of Batting CSV file
+#        "battingfile": "Batting_2016.csv", # Name of Batting CSV file
+#        "separator": ",",                  # Separator character in CSV files
+#        "quote": '"',                      # Quote character in CSV files
+#        "playerid": "playerID",            # Player ID field name
+#        "firstname": "nameFirst",          # First name field name
+#        "lastname": "nameLast",            # Last name field name
+#        "yearid": "yearID",                # Year field name
+#        "atbats": "AB",                    # At bats field name
+#        "hits": "H",                       # Hits field name
+#        "doubles": "2B",                   # Doubles field name
+#        "triples": "3B",                   # Triples field name
+#        "homeruns": "HR",                  # Home runs field name
+#        "walks": "BB",                     # Walks field name
+#        "battingfields": ["AB", "H", "2B", "3B", "HR", "BB"]}
+#"""
